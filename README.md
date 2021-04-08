@@ -1,4 +1,4 @@
-# test
+# csv2gpx
 
 ## Project setup
 ```

@@ -1,5 +1,5 @@
 {
-  "name": "test",
+  "name": "csv2gpx",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,9 +9,15 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "element-ui": "^2.15.1",
+    "file-saver": "^2.0.5",
+    "gcoord": "^0.3.1",
+    "gpx-parser-builder": "^1.0.2",
+    "papaparse": "^5.3.0",
     "vue": "^2.6.11"
   },
   "devDependencies": {
+    "@types/papaparse": "^5.2.5",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
