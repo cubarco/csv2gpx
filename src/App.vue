@@ -99,11 +99,7 @@ function transformCoord(longitude, latitude) {
   let crsFromCode = crsMap.get(window.crsFrom);
   let crsToCode = crsMap.get(window.crsTo);
 
-  let result = gcoord.transform(
-    [longitude, latitude],
-    crsFromCode,
-    crsToCode
-  );
+  let result = gcoord.transform([longitude, latitude], crsFromCode, crsToCode);
   return result;
 }
 
@@ -144,7 +140,7 @@ function csv2gpx(csv, callback) {
     var wpt = getGpxWaypoint(point[0], point[1], parseInt(row[0]) * 1000);
     wpts.push(wpt);
   });
-  var gpx = new GPX({ wpt: wpts });
+  var gpx = new GPX({ trk: [{ trkseg: [{ trkpt: wpts }] }] });
   var blob = new Blob([gpx.toString()], {
     type: "application/gpx+xml;charset=utf-8",
   });
