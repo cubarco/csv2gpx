@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "dateformat": "^4.5.1",
     "element-ui": "^2.15.1",
     "file-saver": "^2.0.5",
     "gcoord": "^0.3.1",

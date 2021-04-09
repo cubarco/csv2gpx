@@ -1,11 +1,29 @@
 <template>
-  <div id="app">
-    <el-container
-      style="width: 60vw; position: relative; left: 50%; right: 50%; margin-left: -30vw; margin-right: -30vw"
-    >
+  <div id="app" style="display: flex; justify-content: center;">
+    <el-container style="maxWidth: 700px;">
       <el-main>
+        <el-alert
+          title="将足迹 APP 导出的 CSV 文件转换为 GPX 文件"
+          type="info"
+          :closable="false"
+          style="margin-bottom: 20px;"
+        >
+        </el-alert>
+        <el-alert
+          title="使用说明"
+          type="success"
+          description="足迹输出的 CSV 的 timestamp 为 UTC 时区，坐标为 WGS-84 参考系。若将输出的 GPX 文件用于设置照片的 GPS 信息（即 Geoset），可以使用默认勾选的 WGS84 to GCJ02 模式。此模式下输出的坐标可以在群晖 DS Photo（内置高德地图）、Geosetter软件（Google中国地图）、Soso 地图、Aliyun 地图等软件中正确显示地理位置。"
+          style="margin-bottom: 20px;"
+          :closable="false"
+        >
+        </el-alert>
+        <el-alert
+          title="纯前端应用，不会上传 CSV 文件到服务器！"
+          type="warning"
+          style="margin-bottom: 20px;"
+        >
+        </el-alert>
         <el-upload
-          class="upload-demo"
           action
           drag
           :on-preview="handlePreview"
@@ -18,30 +36,43 @@
         >
           <i class="el-icon-upload" />
           <div class="el-upload__text">
-            将CSV文件拖到此处，或<em>点击上传</em>
+            将CSV文件拖到此处，或<em>点击打开</em>
           </div>
-          <div class="el-upload__tip" slot="tip">坐标系转换:</div>
-          <el-checkbox-group
+          <div class="el-upload__tip" slot="tip">源坐标参考系:</div>
+          <el-radio-group
             class="el-upload__tip"
             slot="tip"
-            v-model="transformMode"
-            @change="handleTransformModeChange"
+            v-model="crsFrom"
+            @change="handleCrsFromChange"
             size="mini"
           >
-            <el-checkbox label="WGS84 to GCJ02" border
-              >WGS84 to GCJ02 (足迹)</el-checkbox
+            <el-radio label="WGS84" border>WGS84（足迹）</el-radio>
+            <el-radio label="GCJ02" border />
+            <el-radio label="BD09" border />
+          </el-radio-group>
+          <div class="el-upload__tip" slot="tip">目标坐标参考系:</div>
+          <el-radio-group
+            class="el-upload__tip"
+            slot="tip"
+            v-model="crsTo"
+            @change="handleCrsToChange"
+            size="mini"
+          >
+            <el-radio label="WGS84" border>WGS84（国际）</el-radio>
+            <el-radio label="GCJ02" border
+              >GCJ02（DS Photo、高德、Google中国）</el-radio
             >
-            <el-checkbox label="GCJ02 to WGS84" border></el-checkbox>
-          </el-checkbox-group>
-          <div class="el-upload__tip" slot="tip">
-            输出文件名:
-            <el-input
-              size="mini"
-              v-model="outputFilename"
-              placeholder="默认为: 时间.gpx"
-              @input="handleOutputFilenameChange"
-            ></el-input>
-          </div>
+            <el-radio label="BD09" border>BD09（百度）</el-radio>
+          </el-radio-group>
+          <div class="el-upload__tip" slot="tip">输出文件名:</div>
+          <el-input
+            class="el-upload__tip"
+            slot="tip"
+            size="mini"
+            v-model="outputFilename"
+            placeholder="默认为: 时间.gpx"
+            @input="handleOutputFilenameChange"
+          ></el-input>
         </el-upload>
       </el-main>
     </el-container>
@@ -53,25 +84,27 @@ import * as Papa from "papaparse";
 import GPX from "gpx-parser-builder";
 import { saveAs } from "file-saver";
 import gcoord from "gcoord";
+import dateformat from "dateformat";
 
 function transformCoord(longitude, latitude) {
-  if (!window.transformMode || window.transformMode.length == 0) {
+  if (window.crsTo == window.crsFrom) {
     return [longitude, latitude];
-  } else if (window.transformMode[0] == "WGS84 to GCJ02") {
-    let result = gcoord.transform(
-      [longitude, latitude],
-      gcoord.WGS84,
-      gcoord.GCJ02
-    );
-    return result;
-  } else if (window.transformMode[0] == "GCJ02 to WGS84") {
-    let result = gcoord.transform(
-      [longitude, latitude],
-      gcoord.GCJ02,
-      gcoord.WGS84
-    );
-    return result;
   }
+
+  let crsMap = new Map();
+  crsMap.set("WGS84", gcoord.WGS84);
+  crsMap.set("GCJ02", gcoord.GCJ02);
+  crsMap.set("BD09", gcoord.BD09);
+
+  let crsFromCode = crsMap.get(window.crsFrom);
+  let crsToCode = crsMap.get(window.crsTo);
+
+  let result = gcoord.transform(
+    [longitude, latitude],
+    crsFromCode,
+    crsToCode
+  );
+  return result;
 }
 
 function getGpxWaypoint(longitude, latitude, time) {
@@ -85,14 +118,14 @@ function getGpxWaypoint(longitude, latitude, time) {
 }
 
 function getOutputFilename() {
-  var outputFilename = window.outputFilename
+  var outputFilename = window.outputFilename;
   if (!outputFilename || outputFilename.length == 0) {
-    return Date.now() + ".gpx"
+    return dateformat(new Date(), "yyyy-dd-M--HH-mm-ss") + ".gpx";
   } else {
     if (!outputFilename.match(/.*\.gpx$/i)) {
-      return outputFilename + ".gpx"
+      return outputFilename + ".gpx";
     } else {
-      return outputFilename
+      return outputFilename;
     }
   }
 }
@@ -121,8 +154,7 @@ function csv2gpx(csv, callback) {
 
 function processCsvFile(file, callback) {
   if (!file.name.match(/.*\.csv$/i)) {
-    if (callback.alert) callback.alert("只能上传CSV文件");
-    if (callback.onError) callback.onError();
+    if (callback.onError) callback.onError("只能打开 CSV 文件!");
     return;
   }
   let fReader = new FileReader();
@@ -132,33 +164,38 @@ function processCsvFile(file, callback) {
   };
 }
 
-window.transformMode = ["WGS84 to GCJ02"];
 window.outputFilename = "";
+window.crsFrom = "WGS84";
+window.crsTo = "GCJ02";
 
 export default {
   name: "App",
   data() {
     return {
       fileList: [],
-      transformMode: window.transformMode,
       outputFilename: window.outputFilename,
+      crsFrom: window.crsFrom,
+      crsTo: window.crsTo,
     };
   },
   methods: {
-    handleTransformModeChange(val) {
-      if (val.length == 2) {
-        this.transformMode.shift();
-      }
-      window.transformMode = this.transformMode;
+    handleCrsFromChange(val) {
+      window.crsFrom = val;
+    },
+    handleCrsToChange(val) {
+      window.crsTo = val;
     },
     // eslint-disable-next-line no-unused-vars
     handleOutputFilenameChange(val) {
       window.outputFilename = this.outputFilename;
     },
     httpRequest(param) {
+      var _this = this;
       processCsvFile(param.file, {
-        alert: this.$alert,
-        onError() {
+        onError: (msg) => {
+          if (msg && msg.length != 0) {
+            _this.$message.error(msg);
+          }
           param.onError();
         },
         onSuccess() {
@@ -171,9 +208,13 @@ export default {
       //console.log(file, fileList);
     },
     handlePreview(file) {
+      var _this = this;
       processCsvFile(file.raw, {
-        alert: this.$alert,
-        onError() {},
+        onError: (msg) => {
+          if (msg && msg.length != 0) {
+            _this.$message.error(msg);
+          }
+        },
         onSuccess() {},
       });
     },
