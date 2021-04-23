@@ -33,6 +33,7 @@
           :auto-upload="true"
           multiple
           :file-list="fileList"
+          accept=".csv"
         >
           <i class="el-icon-upload" />
           <div class="el-upload__text">
