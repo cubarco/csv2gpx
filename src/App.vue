@@ -117,7 +117,7 @@ function getGpxWaypoint(longitude, latitude, time) {
 function getOutputFilename() {
   var outputFilename = window.outputFilename;
   if (!outputFilename || outputFilename.length == 0) {
-    return dateformat(new Date(), "yyyy-dd-M--HH-mm-ss") + ".gpx";
+    return dateformat(new Date(), "yyyy-mm-dd--HH-MM-ss") + ".gpx";
   } else {
     if (!outputFilename.match(/.*\.gpx$/i)) {
       return outputFilename + ".gpx";
