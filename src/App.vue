@@ -59,7 +59,7 @@
             @change="handleCrsToChange"
             size="mini"
           >
-            <el-radio label="WGS84" border>WGS84（国际）</el-radio>
+            <el-radio label="WGS84" border>WGS84（Synoloy Photos）</el-radio>
             <el-radio label="GCJ02" border
               >GCJ02（DS Photo、高德、Google中国）</el-radio
             >
@@ -163,7 +163,7 @@ function processCsvFile(file, callback) {
 
 window.outputFilename = "";
 window.crsFrom = "WGS84";
-window.crsTo = "GCJ02";
+window.crsTo = "WGS84";
 
 export default {
   name: "App",
