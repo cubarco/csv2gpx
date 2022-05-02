@@ -59,7 +59,7 @@
             @change="handleCrsToChange"
             size="mini"
           >
-            <el-radio label="WGS84" border>WGS84（Synoloy Photos）</el-radio>
+            <el-radio label="WGS84" border>WGS84（Synology Photos）</el-radio>
             <el-radio label="GCJ02" border
               >GCJ02（DS Photo、高德、Google中国）</el-radio
             >
