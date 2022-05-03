@@ -22,6 +22,7 @@
           type="warning"
           style="margin-bottom: 20px;"
         >
+        </el-alert>
         <el-alert
           title="群晖升级 7.0 后，Photos 的坐标系由 GCJ02 变更为 WGS84！"
           type="warning"
