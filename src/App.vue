@@ -12,13 +12,18 @@
         <el-alert
           title="使用说明"
           type="success"
-          description="足迹输出的 CSV 的 timestamp 为 UTC 时区，坐标为 WGS-84 参考系。若将输出的 GPX 文件用于设置照片的 GPS 信息（即 Geoset），可以使用默认勾选的 WGS84 to GCJ02 模式。此模式下输出的坐标可以在群晖 DS Photo（内置高德地图）、Geosetter软件（Google中国地图）、Soso 地图、Aliyun 地图等软件中正确显示地理位置。"
+          description="足迹输出的 CSV 的 timestamp 为 UTC 时区，坐标为 WGS-84 参考系。若将输出的 GPX 文件用于设置照片的 GPS 信息（即 Geoset），可以使用默认勾选的 WGS84 to WGS84 模式。此模式下输出的坐标可以在群晖 7.0+ 的 Photos 中正确显示地理位置。"
           style="margin-bottom: 20px;"
           :closable="false"
         >
         </el-alert>
         <el-alert
           title="纯前端应用，不会上传 CSV 文件到服务器！"
+          type="warning"
+          style="margin-bottom: 20px;"
+        >
+        <el-alert
+          title="群晖升级 7.0 后，Photos 的坐标系由 GCJ02 变更为 WGS84！"
           type="warning"
           style="margin-bottom: 20px;"
         >
