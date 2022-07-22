@@ -9,9 +9,13 @@ jobs:
     name: Build Vue
     steps:
     - uses: actions/checkout@v3
+    - name: Install Node.js, NPM and Yarn
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16
     - name: Install and Build 🔧
       run: |
-        npm install
+        npm ci
         npm run build
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4
