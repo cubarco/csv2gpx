@@ -71,6 +71,16 @@
             >
             <el-radio label="BD09" border>BD09（百度）</el-radio>
           </el-radio-group>
+          <div class="el-upload__tip" slot="tip">
+            <input
+              type="checkbox"
+              checked
+              id="checkbox"
+              v-model="oneYearLimitChecked"
+              @change="handleOneYearLimitChange"
+            />
+            <label for="checkbox">只导出一年内轨迹</label>
+          </div>
           <div class="el-upload__tip" slot="tip">输出文件名:</div>
           <el-input
             class="el-upload__tip"
@@ -142,9 +152,13 @@ function csv2gpx(csv, callback) {
     //去除最后的空行
     data.pop();
   }
+  var dateNow = Math.floor(Date.now() / 1000);
   data.forEach((row) => {
+    var datePt = parseInt(row[0]);
+    // Ignore points one year ago.
+    if (window.oneYearLimitChecked && datePt < dateNow - 31536000) return; // return equals contine in for-each
     var point = transformCoord(parseFloat(row[2]), parseFloat(row[3]));
-    var wpt = getGpxWaypoint(point[0], point[1], parseInt(row[0]) * 1000);
+    var wpt = getGpxWaypoint(point[0], point[1], datePt * 1000);
     wpts.push(wpt);
   });
   var gpx = new GPX({ trk: [{ trkseg: [{ trkpt: wpts }] }] });
@@ -170,6 +184,7 @@ function processCsvFile(file, callback) {
 window.outputFilename = "";
 window.crsFrom = "WGS84";
 window.crsTo = "WGS84";
+window.oneYearLimitChecked = true;
 
 export default {
   name: "App",
@@ -179,9 +194,13 @@ export default {
       outputFilename: window.outputFilename,
       crsFrom: window.crsFrom,
       crsTo: window.crsTo,
+      oneYearLimitChecked: window.oneYearLimitChecked,
     };
   },
   methods: {
+    handleOneYearLimitChange() {
+      window.oneYearLimitChecked = this.oneYearLimitChecked;
+    },
     handleCrsFromChange(val) {
       window.crsFrom = val;
     },
